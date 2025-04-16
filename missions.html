@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guild Missions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('Back.jpg') no-repeat center center/cover;
+            color: #fff;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+            background-color: rgba(12, 16, 34, 0.8);
+            border-bottom: 2px solid #24e180;
+            border-radius: 0 0 20px 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #24e180;
+            font-weight: 600;
+            font-size: 18px;
+            transition: 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #fadb55;
+            text-shadow: 0 0 5px #fadb55;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 36px;
+            color: #fadb55;
+        }
+
+        h2 {
+            margin: 40px 0 20px;
+            font-size: 28px;
+            padding-left: 20px;
+        }
+
+        .missions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .mission-card {
+            background-color: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .mission-card:hover {
+            border-color: #24e180;
+        }
+
+        .mission-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .mission-desc {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #ccc;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 99;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            background: #1c1c1c;
+            margin: 10% auto;
+            padding: 20px;
+            border: 2px solid #24e180;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            color: #fff;
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #fadb55;
+        }
+
+        .hunter-list {
+            margin-top: 10px;
+        }
+
+        .hunter {
+            margin: 5px 0;
+            color: #90ee90;
+        }
+
+        .filter-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .filter-container select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #24e180;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-container select:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-container select:focus {
+            outline: none;
+            border-color: #fadb55;
+            background-color: orange; /* Change background to orange on focus */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="missions.html">Missions</a>
+        <a href="hunters.html">Hunters</a>
+        <a href="gates.html">Gates</a>
+    </nav>
+
+    <h1>Guild Missions</h1>
+
+    <!-- Filter Dropdown -->
+    <div class="filter-container">
+        <label for="rankFilter">Filter by Rank:</label>
+        <select id="rankFilter" onchange="filterMissions()">
+            <option value="all">All</option>
+            <option value="S">S</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+        </select>
+    </div>
+
+    <!-- Dynamic Ranks & Missions -->
+    <div id="mission-sections"></div>
+
+    <!-- Mission Detail Modal -->
+    <div id="missionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDesc"></p>
+            <h3>Assigned Hunters:</h3>
+            <div id="modalHunters" class="hunter-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const missionData = {
+            "S": {
+                color: "#ff4f4f", count: 3, missions: [
+                    { title: "🔥 Demon King's Resurrection", desc: "Only the elite may enter the Abyss Dungeon.", hunters: [{ name: "Jin-Woo", rank: "S" }, { name: "Baek Yoon-Ho", rank: "S" }] },
+                    { title: "🧊 Ice Titan’s Wrath", desc: "Northern Gate releasing freezing giants.", hunters: [{ name: "Go Gun-Hee", rank: "S" }, { name: "Jin-Woo", rank: "S" }] },
+                    { title: "🌌 Dimensional Rift", desc: "Reality breaking inside an unstable gate.", hunters: [{ name: "Choi Jong-In", rank: "S" }] },
+                ]
+            },
+            "A": {
+                color: "#ff944d", count: 5, missions: [
+                    { title: "⚔️ Crimson Orc Warlord", desc: "Prevent unification of orc tribes.", hunters: [{ name: "Han Song-Yi", rank: "A" }] },
+                    { title: "🌪️ Storm Gate Breach", desc: "Elementals escaping a rogue gate.", hunters: [{ name: "Kim Chul", rank: "A" }] },
+                    { title: "🔥 Flame Elemental Herd", desc: "Flame spirits burning forest zones.", hunters: [{ name: "Yoo Jin-Ho", rank: "A" }] },
+                    { title: "👁️ Shadow Interference", desc: "Shadow creatures causing anomalies.", hunters: [{ name: "Park Hee-Jin", rank: "A" }] },
+                    { title: "⚡ Thunder Wyvern", desc: "Sighted above Eastern Mountains.", hunters: [{ name: "Cha Hae-In", rank: "S" }] },
+                ]
+            },
+            "B": {
+                color: "#ffcc00", count: 8, missions: [
+                    { title: "🐺 Werewolf Den", desc: "Clear den near Ridge Town.", hunters: [{ name: "Kang Tae-Shik", rank: "B" }] },
+                    { title: "👻 Haunted Mansion", desc: "Purge cursed estate.", hunters: [{ name: "Lee Joo-Hee", rank: "B" }] },
+                    { title: "🦂 Scorpion Tunnel", desc: "Poisonous nest in the mines.", hunters: [{ name: "Unknown", rank: "B" }] },
+                    { title: "🦴 Bone Reaper Cult", desc: "Stop underground rituals.", hunters: [{ name: "Kim", rank: "B" }] },
+                    { title: "🌋 Lava Beast Uprising", desc: "Beasts from volcanic gate.", hunters: [{ name: "Team C", rank: "B" }] },
+                    { title: "🐉 Lesser Drake", desc: "Wounded drake rampaging.", hunters: [{ name: "Rookie Team", rank: "B" }] },
+                    { title: "🧠 Mind Parasite", desc: "Possession reports inside city.", hunters: [{ name: "Solo Agent", rank: "B" }] },
+                    { title: "💀 Death Howl", desc: "Wolves with deafening screams.", hunters: [{ name: "Squad Beta", rank: "B" }] },
+                ]
+            },
+            "C": {
+                color: "#00c8ff",
+                count: 13,
+                missions: [
+                    { title: "🐍 Venom Viper Hunt", desc: "Cave system infested with large venomous vipers.", hunters: [{ name: "Hyun-Seok", rank: "C" }] },
+                    { title: "🪦 Tomb of Whispers", desc: "Voices luring villagers into an ancient ruin.", hunters: [{ name: "Min-Ji", rank: "C" }] },
+                    { title: "🕷️ Giant Spider Nest", desc: "Clear out a dangerous spider colony.", hunters: [{ name: "Lee Sang-Min", rank: "C" }] },
+                    { title: "🌲 Forest Spirit Disturbance", desc: "Disrupted spirits attacking travelers.", hunters: [{ name: "Team Windblade", rank: "C" }] },
+                    { title: "🧟‍♂️ Wandering Corpses", desc: "Zombies seen near southern farm.", hunters: [{ name: "Unit Red-9", rank: "C" }] },
+                    { title: "🗿 Stone Golem Rampage", desc: "Golem from gate gone berserk.", hunters: [{ name: "Ha-Na", rank: "C" }] },
+                    { title: "👣 Invisible Predator", desc: "Something unseen is hunting hunters.", hunters: [{ name: "Park Doo-Hyun", rank: "C" }] },
+                    { title: "🔥 Pyro Rat Swarm", desc: "Fire rats are infesting metro tunnels.", hunters: [{ name: "Urban Sweep Team", rank: "C" }] },
+                    { title: "🦇 Bat Demon Lair", desc: "Winged demons in an abandoned cathedral.", hunters: [{ name: "Shin-Hye", rank: "C" }] },
+                    { title: "💀 Bone Puppeteer", desc: "Skeletons animated by rogue mage.", hunters: [{ name: "Tactical Unit 8", rank: "C" }] },
+                    { title: "🎭 Masked Phantom", desc: "Ghostly figure disrupting low-rank gates.", hunters: [{ name: "Jin-Ah", rank: "C" }] },
+                    { title: "🪓 Ogre Duelist", desc: "An ogre challenges duelists at nightfall.", hunters: [{ name: "Gang Squad Beta", rank: "C" }] },
+                    { title: "🌕 Full Moon Frenzy", desc: "Gate beasts go berserk during full moon.", hunters: [{ name: "Rogue Hunter: Tae-Jun", rank: "C" }] },
+                ]
+            },
+            "D": {
+                color: "#8bc34a",
+                count: 15,
+                missions: [
+                    { title: "🪲 Forest Beetle Nest", desc: "Oversized beetles are eating crops near village outskirts.", hunters: [{ name: "Nam Joo", rank: "D" }] },
+                    { title: "🐍 Sewer Snake Sweep", desc: "Snakes nesting in sewer tunnels. Exterminate safely.", hunters: [{ name: "Sewer Patrol Team 3", rank: "D" }] },
+                    { title: "🦨 Skunk Demon Patrol", desc: "Demon skunks releasing toxic clouds in alleys.", hunters: [{ name: "Lee Na-Ri", rank: "D" }] },
+                    { title: "📦 Lost Cargo Recovery", desc: "Gate creatures looted merchant cargo. Recover safely.", hunters: [{ name: "Rookie Squad Delta", rank: "D" }] },
+                    { title: "🦟 Plague Mosquitoes", desc: "Mutated mosquitoes carrying cursed disease.", hunters: [{ name: "Dr. Hwan’s Clean Team", rank: "D" }] },
+                    { title: "🐾 Feral Wolf Pack", desc: "Wolves have formed a large pack outside northern woods.", hunters: [{ name: "Shin-Do", rank: "D" }] },
+                    { title: "⚱️ Graveyard Screamer", desc: "Noises from an old cemetery disturbing locals.", hunters: [{ name: "Silent Night Unit", rank: "D" }] },
+                    { title: "🕳️ Burrow Watch", desc: "Gate tunneler creating holes beneath the town.", hunters: [{ name: "Burrow Response Team", rank: "D" }] },
+                    { title: "🦝 Raccoon Thief Gang", desc: "Small creatures stealing enchanted objects.", hunters: [{ name: "Hana", rank: "D" }] },
+                    { title: "🌊 Waterfront Lurkers", desc: "Unknown creatures seen in shallow rivers at night.", hunters: [{ name: "Team Aqua Claw", rank: "D" }] },
+                    { title: "🍄 Fungal Growth Patrol", desc: "Strange mushrooms causing dizziness. Investigate origins.", hunters: [{ name: "Spore Squad", rank: "D" }] },
+                    { title: "🌪️ Dust Imp Sweep", desc: "Dust imps hiding inside abandoned mines.", hunters: [{ name: "Min-Ho", rank: "D" }] },
+                    { title: "📜 Stolen Scroll Recovery", desc: "Low-level mage fled with dangerous scroll.", hunters: [{ name: "Academy Scout Team", rank: "D" }] },
+                    { title: "🧊 Ice Slug Removal", desc: "Slippery slugs freezing crops near gates.", hunters: [{ name: "Frost Resistance Force", rank: "D" }] },
+                    { title: "🪵 Forest Rumble", desc: "Moving tree stumps attacking travelers.", hunters: [{ name: "Woodcutters Guild Escort", rank: "D" }] }
+                ]
+            },
+            "E": {
+                color: "#cccccc",
+                count: 20,
+                missions: [
+                    { title: "🧹 Alleyway Clean-up", desc: "Sweep out leftover mana dust and debris from a collapsed gate.", hunters: [{ name: "Kim Jae-Hoon", rank: "E" }] },
+                    { title: "🐀 Sewer Rat Control", desc: "Eliminate mutated rats spreading through the drainage tunnels.", hunters: [{ name: "Jung Yumi", rank: "E" }] },
+                    { title: "📦 Package Escort", desc: "Escort magical cargo across town. High caution not required.", hunters: [{ name: "Team Haetae", rank: "E" }] },
+                    { title: "🪵 Fallen Tree Clearance", desc: "Clear enchanted fallen trees blocking merchant roads.", hunters: [{ name: "B-Road Workers Guild", rank: "E" }] },
+                    { title: "🐖 Boar Herd Scare", desc: "Wild boars near farms need to be redirected without injury.", hunters: [{ name: "Park Min", rank: "E" }] },
+                    { title: "🧼 Monster Blood Cleanup", desc: "Clean corrupted blood from a school gate incident.", hunters: [{ name: "Support Unit 07", rank: "E" }] },
+                    { title: "🧊 Ice Patch Removal", desc: "Leftover freezing zone causes injuries. Dissolve ice remains.", hunters: [{ name: "Cold Disposal Crew", rank: "E" }] },
+                    { title: "📮 Letter Delivery to Guild HQ", desc: "Deliver a sealed scroll safely to the Guild Administration.", hunters: [{ name: "Choi Da-In", rank: "E" }] },
+                    { title: "🍂 Gate Residue Survey", desc: "Record strange plant growth post-gate collapse.", hunters: [{ name: "E-Rank Botanical Scouts", rank: "E" }] },
+                    { title: "🎈 Festival Gate Watch", desc: "Watch for energy spikes during seasonal festival.", hunters: [{ name: "Event Patrol Team", rank: "E" }] },
+                    { title: "💡 Light Crystal Maintenance", desc: "Replace fading crystals around the outskirts.", hunters: [{ name: "Tech Assist Squad", rank: "E" }] },
+                    { title: "🪙 Coin Charm Retrieval", desc: "Recover minor magical items tossed by civilians.", hunters: [{ name: "Young Explorers", rank: "E" }] },
+                    { title: "🐌 Slime Sweep", desc: "Clear trail of sticky slimes spotted after a minor gate flicker.", hunters: [{ name: "Slime Sweepers", rank: "E" }] },
+                    { title: "🚧 Border Patrol Training", desc: "Beginner mission to learn routine scouting along safe routes.", hunters: [{ name: "Novice Watchers", rank: "E" }] },
+                    { title: "🏚️ Abandoned Shack Check", desc: "Investigate minor mana pulses in old buildings.", hunters: [{ name: "Building Inspector Squad", rank: "E" }] },
+                    { title: "📚 Archive Sorting Help", desc: "Support the Guild Archives by sorting beast scrolls.", hunters: [{ name: "Lee Han", rank: "E" }] },
+                    { title: "🐸 Toad Pond Evacuation", desc: "Move enchanted toads before the next guild expansion.", hunters: [{ name: "Toad Keepers", rank: "E" }] },
+                    { title: "🎒 Lost Student Search", desc: "A junior mage lost their way near training grounds.", hunters: [{ name: "Academy Watch", rank: "E" }] },
+                    { title: "🧲 Magnet Stone Removal", desc: "Disarm weak magnetic stones interfering with comms.", hunters: [{ name: "Field Fixers", rank: "E" }] },
+                    { title: "🌾 Crop Blessing Support", desc: "Assist in basic rituals to restore cursed crops.", hunters: [{ name: "Harvest Team Alpha", rank: "E" }] }
+                ]
+            }
+        };
+
+        const missionSections = document.getElementById('mission-sections');
+
+        function displayMissions(rankFilter) {
+            missionSections.innerHTML = ''; // Clear previous missions
+            for (const rank in missionData) {
+                if (rankFilter === 'all' || rank === rankFilter) {
+                    const { color, missions } = missionData[rank];
+
+                    const section = document.createElement('div');
+                    section.innerHTML = `
+                        <h2 style="color:${color}">${rank}-Rank Missions</h2>
+                        <div class="missions-container" id="rank-${rank}"></div>
+                    `;
+                    missionSections.appendChild(section);
+
+                    const container = section.querySelector(`#rank-${rank}`);
+                    missions.forEach((mission) => {
+                        const card = document.createElement('div');
+                        card.className = "mission-card";
+                        card.innerHTML = `
+                            <div class="mission-title" style="color:${color}">${mission.title}</div>
+                            <div class="mission-desc">${mission.desc}</div>
+                        `;
+                        card.onclick = () => showDetails(mission.title, mission.desc, mission.hunters);
+                        container.appendChild(card);
+                    });
+                }
+            }
+        }
+
+        function filterMissions() {
+            const rankFilter = document.getElementById('rankFilter').value;
+            displayMissions(rankFilter);
+        }
+
+        function showDetails(title, desc, hunters) {
+            document.getElementById("modalTitle").textContent = title;
+            document.getElementById("modalDesc").textContent = desc;
+            const hunterDiv = document.getElementById("modalHunters");
+            hunterDiv.innerHTML = "";
+            hunters.forEach(h => {
+                const div = document.createElement('div');
+                div.className = "hunter";
+                div.textContent = `🧝 ${h.name} - Rank ${h.rank}`;
+                hunterDiv.appendChild(div);
+            });
+            document.getElementById("missionModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("missionModal").style.display = "none";
+        }
+
+        // Initial display of all missions
+        displayMissions('all');
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hunter Guild Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100%;
+      height: 100vh;
+      background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('background.jpeg');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .login_form_container {
+      width: 400px;
+      border-radius: 50px 5px;
+    }
+
+    .form_content {
+      /* background-color: rgba(12, 16, 34, 0.8); */
+      padding: 40px;
+      border-radius: 50px 5px;
+      color: #fadb55;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 30px auto;
+      width: 150px;
+      filter: drop-shadow(0 0 5px #fadb55);
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 25px;
+      color: #e78a19;
+      text-shadow: 0 0 10px #000;
+    }
+
+    .input_group {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #24e180;
+    }
+
+    .input_group i {
+      color: #24e180;
+      padding: 10px;
+    }
+
+    .input_group input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #24e180;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    ::placeholder {
+      color: #24e18079;
+    }
+
+    .button_group {
+      margin-top: 30px;
+    }
+
+    .button_group button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cf5c2e;
+      background: transparent;
+      color: #fff;
+      font-size: 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .button_group button:hover {
+      background-color: #e78a19;
+      color: #000;
+    }
+
+    .toggle_form {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .toggle_form a {
+      color: #24e180;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 450px) {
+      .login_form_container {
+        width: 90%;
+        border-radius: 20px;
+      }
+
+      .form_content {
+        padding: 25px;
+      }
+
+      .logo {
+        width: 120px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login_form_container">
+    <!-- Login Form -->
+    <div class="form_content" id="loginForm">
+      <img src="Logo (1).png" alt="Hunter Guild Logo" class="logo">
+      <h2>Login</h2>
+      <div class="input_group">
+        <i class="fa fa-user"></i>
+        <input type="text" placeholder="Username" id="loginUsername" />
+      </div>
+      <div class="input_group">
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="Password" id="loginPassword" />
+      </div>
+      <div class="button_group">
+        <button onclick="submitLogin()">Login</button>
+      </div>
+      <div class="toggle_form">
+        Don't have an account? <a onclick="toggleForms()">Sign up</a>
+      </div>
+    </div>
+
+    <!-- Sign Up Form -->
+    <div class="form_content hidden" id="signupForm">
+      <img src="Logo (1).png" alt="Hunter Guild Logo" class="logo">
+      <h2>Sign Up</h2>
+      <div class="input_group">
+        <i class="fa fa-user"></i>
+        <input type="text" placeholder="Username" id="signupUsername" />
+      </div>
+      <div class="input_group">
+        <i class="fa fa-envelope"></i>
+        <input type="email" placeholder="Email" id="signupEmail" />
+      </div>
+      <div class="input_group">
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="Password" id="signupPassword" />
+      </div>
+      <div class="button_group">
+        <button onclick="submitSignup()">Sign Up</button>
+      </div>
+      <div class="toggle_form">
+        Already have an account? <a onclick="toggleForms()">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleForms() {
+      document.getElementById('loginForm').classList.toggle('hidden');
+      document.getElementById('signupForm').classList.toggle('hidden');
+    }
+
+    function submitLogin() {
+      // Redirect without alert
+      window.location.href = "index.html";
+    }
+
+    function submitSignup() {
+      // You can store the data or just simulate success
+      toggleForms(); // after signup, go to login form
+    }
+  </script>
+
+</body>
+</html>
